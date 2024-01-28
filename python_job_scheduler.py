@@ -15,6 +15,13 @@ def clone_git_repo(repo_url, repo_dir):
         subprocess.call(["git", "clone", repo_url, repo_dir])
 
 
+# Function to install python dependencies
+def install_python_dependencies(repo_dir):
+    requirements_file = os.path.join(repo_dir, "requirements.txt")
+    if os.path.exists(requirements_file):
+        subprocess.call(["pip", "install", "-r", requirements_file])
+
+
 # Function to run python scripts
 def run_python_scripts(directory, file):
     subprocess.call(["python", os.path.join(directory, file)])
@@ -45,6 +52,7 @@ def main():
 
     # Clone the git repository
     clone_git_repo(repo_url, repo_dir)
+    install_python_dependencies(repo_dir)
 
     # Load job schedule from config file
     config_file = os.path.join(repo_dir, "config.toml")

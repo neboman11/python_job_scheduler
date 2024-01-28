@@ -2,8 +2,9 @@ import os
 import subprocess
 import schedule
 import time
-import yaml
-import glob
+import tomllib
+
+from dotenv import load_dotenv
 
 
 # Function to clone the git repository
@@ -15,29 +16,29 @@ def clone_git_repo(repo_url, repo_dir):
 
 
 # Function to run python scripts
-def run_python_scripts(directory):
-    python_files = glob.glob(os.path.join(directory, "*.py"))
-    for python_file in python_files:
-        subprocess.call(["python", python_file])
+def run_python_scripts(directory, file):
+    subprocess.call(["python", os.path.join(directory, file)])
 
 
 # Function to load job schedule from config file
 def load_job_schedule(config_file):
-    with open(config_file, "r") as file:
-        config = yaml.safe_load(file)
+    with open(config_file, "rb") as file:
+        config = tomllib.load(file)
     return config
 
 
 # Function to schedule jobs
 def schedule_jobs(job_schedule, repo_dir):
-    for job in job_schedule:
-        schedule.every(job["interval"]).seconds.do(
-            run_python_scripts, directory=repo_dir
+    for job in job_schedule["scheduled_job"]:
+        schedule.every().day.at(job["scheduled_run_time"]).do(
+            run_python_scripts, directory=repo_dir, file=job["file"]
         )
 
 
 # Main function
 def main():
+    load_dotenv()
+
     # Get repository URL from environment variable
     repo_url = os.getenv("GIT_REPO_URL")
     repo_dir = "repo"
@@ -46,7 +47,7 @@ def main():
     clone_git_repo(repo_url, repo_dir)
 
     # Load job schedule from config file
-    config_file = os.path.join(repo_dir, "config.yaml")
+    config_file = os.path.join(repo_dir, "config.toml")
     job_schedule = load_job_schedule(config_file)
 
     # Schedule jobs

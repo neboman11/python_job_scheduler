@@ -48,6 +48,9 @@ def main():
 
     # Get repository URL from environment variable
     repo_url = os.getenv("GIT_REPO_URL")
+    if repo_url == None:
+        print("Git repo URL not set")
+        exit(1)
     repo_dir = "repo"
 
     # Clone the git repository

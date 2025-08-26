@@ -1,6 +1,7 @@
 FROM python:3.14.0rc2-alpine3.22
 
 RUN apk add git
+RUN apk add build-base
 
 WORKDIR /app
 COPY requirements.txt ./
